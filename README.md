@@ -12,3 +12,9 @@ For all of the example apps you will need to
 - Copy your app key, secret and config into the Credentials file in the example.
 
 ----
+
+## Chirp Connect Demo app
+
+Demonstrates how to use Chirp Connect Android SDK in a sample app.
+- Features: Send and receive random payloads
+- Requires ChirpConnect-Android-3.6.0
