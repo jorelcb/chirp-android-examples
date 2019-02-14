@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
     Boolean startStopSdkBtnPressed = false;
 
-    String APP_KEY = "";
-    String APP_SECRET = "";
-    String APP_CONFIG = "";
+    String APP_KEY = "YOUR_APP_KEY";
+    String APP_SECRET = "YOUR_APP_SECRET";
+    String APP_CONFIG = "YOUR_APP_CONFIG";
 
     String TAG = "ConnectDemoApp";
 
