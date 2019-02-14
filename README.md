@@ -33,7 +33,7 @@ Chirp Messenger uses your device's speaker and microphone to send and receive me
 To be compatible with Chirp Messenger on other platforms, e.g., [messenger.chirp.io](https://messenger.chirp.io),
 the `16khz-mono` protocol should be used.
 
-
+![DemoGIF](/Assets/Messenger.gif)
 
 ### Demo
 
