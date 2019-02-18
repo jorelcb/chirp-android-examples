@@ -18,12 +18,6 @@ android {
     }
 }
 
-repositories {
-    maven {
-        url "https://maven.chirp.io/release"
-    }
-}
-
 
 dependencies {
     implementation 'io.chirp:chirpsdk:3.6.0-beta'
