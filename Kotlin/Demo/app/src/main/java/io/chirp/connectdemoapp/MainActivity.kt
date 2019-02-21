@@ -15,9 +15,9 @@ import io.chirp.connect.ChirpConnect
 import io.chirp.connect.models.ChirpConnectState
 
 private const val REQUEST_RECORD_AUDIO = 1
-internal var APP_KEY = ""
-internal var APP_SECRET = ""
-internal var APP_CONFIG = ""
+internal var CHIRP_APP_KEY = ""
+internal var CHIRP_APP_SECRET = ""
+internal var CHIRP_APP_CONFIG = ""
 
 
 private const val TAG = "ConnectDemoApp"
@@ -54,19 +54,19 @@ class MainActivity : AppCompatActivity() {
         startStopSdkBtn.isClickable = false
         startStopSdkBtn.setOnClickListener { startStopSdk() }
 
-        if (APP_KEY == "" || APP_SECRET == "") {
-            Log.e(TAG, "APP_KEY or APP_SECRET is not set. " +
-                    "Please update with your APP_KEY/APP_SECRET from developers.chirp.io")
+        if (CHIRP_APP_KEY == "" || CHIRP_APP_SECRET == "") {
+            Log.e(TAG, "CHIRP_APP_KEY or CHIRP_APP_SECRET is not set. " +
+                    "Please update with your CHIRP_APP_KEY/CHIRP_APP_SECRET from developers.chirp.io")
             return
         }
 
         /**
          * Key and secret initialisation
          */
-        this.chirpConnect = ChirpConnect(this, APP_KEY, APP_SECRET)
+        this.chirpConnect = ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
         Log.v(TAG, "Connect Version: " + chirpConnect.version)
         versionView.text = chirpConnect.version
-        val setConfigError = chirpConnect.setConfig(APP_CONFIG)
+        val setConfigError = chirpConnect.setConfig(CHIRP_APP_CONFIG)
         if (setConfigError.code > 0) {
             Log.e(TAG, setConfigError.message)
             return

@@ -25,9 +25,9 @@ import android.graphics.Typeface
 
 private const val REQUEST_RECORD_AUDIO = 1
 
-private const val APP_KEY = "YOUR_APP_KEY"
-private const val APP_SECRET = "YOUR_APP_SECRET"
-private const val APP_CONFIG = "YOUR_APP_CONFIG"
+private const val CHIRP_APP_KEY = "YOUR_APP_KEY"
+private const val CHIRP_APP_SECRET = "YOUR_APP_SECRET"
+private const val CHIRP_APP_CONFIG = "YOUR_APP_CONFIG"
 
 private const val TAG = "ChirpMessenger"
 
@@ -56,23 +56,23 @@ class MainActivity : AppCompatActivity() {
         messageReceived.typeface = calibreLight
         sendMessageBtn.typeface = calibreMedium
 
-        if (APP_KEY == "" || APP_SECRET == "") {
-            Log.e(TAG, "APP_KEY or APP_SECRET is not set. " +
-                    "Please update with your APP_KEY/APP_SECRET from developers.chirp.io")
+        if (CHIRP_APP_KEY == "" || CHIRP_APP_SECRET == "") {
+            Log.e(TAG, "CHIRP_APP_KEY or CHIRP_APP_SECRET is not set. " +
+                    "Please update with your CHIRP_APP_KEY/CHIRP_APP_SECRET from developers.chirp.io")
             return
         }
 
         /**
          * Instantiate SDK with key secret and local config string
          */
-        chirpConnect = ChirpConnect(this, APP_KEY, APP_SECRET)
+        chirpConnect = ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
         Log.v(TAG, "Connect Version: " + chirpConnect.version)
 
         chirpConnect.setListenToSelf(false)
         sendMessageBtn.setOnClickListener(sendClickListener)
         messageToSend.addTextChangedListener(textChangedListener)
 
-        val configError = chirpConnect.setConfig(APP_CONFIG)
+        val configError = chirpConnect.setConfig(CHIRP_APP_CONFIG)
         if (configError.code > 0) {
             Log.e(TAG, "ChirpError" + configError.message)
         } else {
