@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
     Boolean startStopSdkBtnPressed = false;
 
-    String APP_KEY = "YOUR_APP_KEY";
-    String APP_SECRET = "YOUR_APP_SECRET";
-    String APP_CONFIG = "YOUR_APP_CONFIG";
+    String CHIRP_APP_KEY = "YOUR_APP_KEY";
+    String CHIRP_APP_SECRET = "YOUR_APP_SECRET";
+    String CHIRP_APP_CONFIG = "YOUR_APP_CONFIG";
 
     String TAG = "ConnectDemoApp";
 
@@ -65,21 +65,21 @@ public class MainActivity extends AppCompatActivity {
 
         context = this;
 
-        if (APP_KEY.equals("") || APP_SECRET.equals("")) {
-            Log.e(TAG, "APP_KEY or APP_SECRET is not set. " +
-                    "Please update with your APP_KEY/APP_SECRET from developers.chirp.io");
+        if (CHIRP_APP_KEY.equals("") || CHIRP_APP_SECRET.equals("")) {
+            Log.e(TAG, "CHIRP_APP_KEY or CHIRP_APP_SECRET is not set. " +
+                    "Please update with your CHIRP_APP_KEY/CHIRP_APP_SECRET from developers.chirp.io");
             return;
         }
 
         /**
          * Key and secret initialisation
          */
-        chirpConnect = new ChirpConnect(this, APP_KEY, APP_SECRET);
+        chirpConnect = new ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET);
 
         Log.v(TAG, "Connect Version: " + chirpConnect.getVersion());
         versionView.setText(chirpConnect.getVersion());
 
-        ChirpError setConfigError = chirpConnect.setConfig(APP_CONFIG);
+        ChirpError setConfigError = chirpConnect.setConfig(CHIRP_APP_CONFIG);
         if (setConfigError.getCode() > 0) {
             Log.e(TAG, setConfigError.getMessage());
         } else {
