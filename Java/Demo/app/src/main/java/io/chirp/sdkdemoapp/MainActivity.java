@@ -1,4 +1,4 @@
-package io.chirp.connectdemoapp;
+package io.chirp.sdkdemoapp;
 
 import android.Manifest;
 import android.content.Context;
@@ -19,6 +19,7 @@ import io.chirp.connect.ChirpConnect;
 import io.chirp.connect.interfaces.ConnectEventListener;
 import io.chirp.connect.models.ChirpConnectState;
 import io.chirp.connect.models.ChirpError;
+import org.apache.commons.codec.binary.Hex;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
              */
             String hexData = "null";
             if (data != null) {
-                hexData = chirpConnect.asHexString(data);
+                hexData = Hex.encodeHexString(data);
             }
             Log.v(TAG, "ConnectCallback: onSending: " + hexData + " on channel: " + channel);
             updateLastPayload(hexData);
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
              */
             String hexData = "null";
             if (data != null) {
-                hexData = chirpConnect.asHexString(data);
+                hexData = Hex.encodeHexString(data);
             }
             updateLastPayload(hexData);
             Log.v(TAG, "ConnectCallback: onSent: " + hexData + " on channel: " + channel);
@@ -141,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
              */
             String hexData = "null";
             if (data != null) {
-                hexData = chirpConnect.asHexString(data);
+                hexData = Hex.encodeHexString(data);
             }
             Log.v(TAG, "ConnectCallback: onReceived: " + hexData + " on channel: " + channel);
             updateLastPayload(hexData);

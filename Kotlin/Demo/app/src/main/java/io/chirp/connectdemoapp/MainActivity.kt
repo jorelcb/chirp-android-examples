@@ -49,10 +49,8 @@ class MainActivity : AppCompatActivity() {
 
         sendPayloadBtn.alpha = .4f
         sendPayloadBtn.isClickable = false
-        sendPayloadBtn.setOnClickListener { sendPayload() }
         startStopSdkBtn.alpha = .4f
         startStopSdkBtn.isClickable = false
-        startStopSdkBtn.setOnClickListener { startStopSdk() }
 
         if (CHIRP_APP_KEY == "" || CHIRP_APP_SECRET == "") {
             Log.e(TAG, "CHIRP_APP_KEY or CHIRP_APP_SECRET is not set. " +
@@ -71,8 +69,10 @@ class MainActivity : AppCompatActivity() {
             Log.e(TAG, setConfigError.message)
             return
         }
+        sendPayloadBtn.setOnClickListener { sendPayload() }
         startStopSdkBtn.alpha = 1f
         startStopSdkBtn.isClickable = true
+        startStopSdkBtn.setOnClickListener { startStopSdk() }
         val versionText = chirpConnect.version + "\n" +
                 chirpConnect.getProtocolName() + " v" +
                 chirpConnect.getProtocolVersion()
@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
              * onSent is called when a send event has completed.
              * The payload argument contains the payload data that was sent.
              */
-            val hexData = chirpConnect.asHexString(payload)
+            val hexData: String = payload.toHex()
             updateLastPayload(hexData)
             Log.v(TAG, "ConnectCallback: onSent: $hexData on channel: $channel")
         }
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
              */
             var hexData = "null"
             if (payload != null) {
-                hexData = chirpConnect.asHexString(payload)
+                hexData = payload.toHex()
             }
             Log.v(TAG, "ConnectCallback: onReceived: $hexData on channel: $channel")
             updateLastPayload(hexData)
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
              * onSending is called when a send event begins.
              * The data argument contains the payload being sent.
              */
-            val hexData = chirpConnect.asHexString(payload)
+            val hexData: String = payload.toHex()
             Log.v(TAG, "ConnectCallback: onSending: $hexData on channel: $channel")
             updateLastPayload(hexData)
         }
@@ -173,11 +173,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        if (!::chirpConnect.isInitialized) return
         chirpConnect.stop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        if (!::chirpConnect.isInitialized) return
         try {
             chirpConnect.close()
         } catch (e: Exception) {
@@ -200,6 +202,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopSdk() {
+        if (!::chirpConnect.isInitialized) return
         val error = chirpConnect.stop()
         if (error.code > 0) {
             Log.e(TAG, "ConnectError: " + error.message)
@@ -211,6 +214,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startSdk() {
+        if (!::chirpConnect.isInitialized) return
         val error = chirpConnect.start()
         if (error.code > 0) {
             Log.e(TAG, "ConnectError: " + error.message)
@@ -246,4 +250,13 @@ class MainActivity : AppCompatActivity() {
             Log.e("ConnectError: ", error.message)
         }
     }
+
+    fun ByteArray.toHex() = this.joinToString(separator = "") {
+        it.toInt().and(0xff).toString(16).padStart(2, '0')
+    }
+
+    fun String.hexStringToByteArray() = ByteArray(this.length / 2) {
+        this.substring(it * 2, it * 2 + 2).toInt(16).toByte()
+    }
+
 }
