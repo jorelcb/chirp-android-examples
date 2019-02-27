@@ -1,4 +1,4 @@
-package io.chirp.connectdemoapp
+package io.chirp.sdkdemoapp
 
 import android.Manifest
 import android.content.pm.PackageManager
