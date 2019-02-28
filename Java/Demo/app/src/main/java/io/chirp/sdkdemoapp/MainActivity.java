@@ -1,4 +1,4 @@
-package io.chirp.connectdemoapp;
+package io.chirp.sdkdemoapp;
 
 import android.Manifest;
 import android.content.Context;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
              */
             String hexData = "null";
             if (data != null) {
-                hexData = chirpConnect.asHexString(data);
+                hexData = bytesToHex(data);
             }
             Log.v(TAG, "ConnectCallback: onSending: " + hexData + " on channel: " + channel);
             updateLastPayload(hexData);
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
              */
             String hexData = "null";
             if (data != null) {
-                hexData = chirpConnect.asHexString(data);
+                hexData = bytesToHex(data);
             }
             updateLastPayload(hexData);
             Log.v(TAG, "ConnectCallback: onSent: " + hexData + " on channel: " + channel);
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
              */
             String hexData = "null";
             if (data != null) {
-                hexData = chirpConnect.asHexString(data);
+                hexData = bytesToHex(data);
             }
             Log.v(TAG, "ConnectCallback: onReceived: " + hexData + " on channel: " + channel);
             updateLastPayload(hexData);
@@ -307,6 +307,17 @@ public class MainActivity extends AppCompatActivity {
         if (error.getCode() > 0) {
             Log.e(TAG, error.getMessage());
         }
+    }
+
+    private final static char[] hexArray = "0123456789abcdef".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
 }
