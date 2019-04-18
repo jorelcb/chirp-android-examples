@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onSystemVolumeChanged(int oldVolume, int newVolume) {
+        public void onSystemVolumeChanged(float oldVolume, float newVolume) {
             /**
              * onSystemVolumeChanged is called when the system volume is changed.
              */
