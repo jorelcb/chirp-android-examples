@@ -22,14 +22,14 @@ import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 
-import java.security.Security;
+import java.security.Security
 import java.util.*
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.Cipher
+import javax.crypto.CipherInputStream
+import javax.crypto.CipherOutputStream
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 
 private const val REQUEST_RECORD_AUDIO = 1
@@ -38,9 +38,9 @@ private const val REQUEST_RECORD_AUDIO = 1
  * TODO: Copy and paste your Chirp app key, secret and config
  * below from https://developers.chirp.io
  */
-const val CHIRP_APP_KEY = "YOUR_CHIRP_APP_KEY";
-const val CHIRP_APP_SECRET = "YOUR_CHIRP_APP_SECRET";
-const val CHIRP_APP_CONFIG = "YOUR_CHIRP_APP_CONFIG";
+const val CHIRP_APP_KEY = "YOUR_CHIRP_APP_KEY"
+const val CHIRP_APP_SECRET = "YOUR_CHIRP_APP_SECRET"
+const val CHIRP_APP_CONFIG = "YOUR_CHIRP_APP_CONFIG"
 
 private const val TAG = "ChirpSecureMessenger"
 
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var chirp: ChirpConnect
 
-    val keyBytes = byteArrayOf(0x43, 0x68, 0x69, 0x72, 0x70, 0x20, 0x48, 0x61, 0x63, 0x6b, 0x61, 0x74, 0x68, 0x6f, 0x6e, 0x21)
+    private val keyBytes = byteArrayOf(0x43, 0x68, 0x69, 0x72, 0x70, 0x20, 0x48, 0x61, 0x63, 0x6b, 0x61, 0x74, 0x68, 0x6f, 0x6e, 0x21)
 
     private lateinit var messageReceived: TextView
     private lateinit var messageToSend: EditText
@@ -77,70 +77,70 @@ class MainActivity : AppCompatActivity() {
         chirp = ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
         Log.v(TAG, "ChirpSDK Version: " + chirp.version)
 
-        chirp.setListenToSelf(false)
+        val setConfigError = chirp.setConfig(CHIRP_APP_CONFIG)
+        if (setConfigError.code > 0) {
+            Log.e("ChirpError: ", setConfigError.message)
+            return
+
+        }
+
+        val startError = chirp.start()
+        if (startError.code > 0) {
+            Log.e(TAG, "ChirpError: " + startError.message)
+            return
+        }
+
+        maxPayloadLength = chirp.maxPayloadLength()
         sendMessageBtn.setOnClickListener(sendClickListener)
         messageToSend.addTextChangedListener(textChangedListener)
 
-        var error = chirp.setConfig(CHIRP_APP_CONFIG)
-        if (error.code == 0) {
-            Log.v("ChirpSDK: ", "Configured ChirpSDK")
+        chirp.onSending {
+            data: ByteArray, channel: Int ->
+            /**
+             * onSending is called when a send event begins.
+             * The data argument contains the payload being sent.
+             */
+            setButtonStyle("SENDING", R.color.send_button_gray_bg, false)
+            val message = String(data, Charsets.UTF_8)
+            Log.v(TAG, "ConnectCallback: onSending: $message on channel: $channel")
+        }
 
-            maxPayloadLength = chirp.maxPayloadLength()
-            val error = chirp.start()
-            if (error.code > 0) {
-                Log.e(TAG, "ChirpError: " + error.message)
+        chirp.onSent {
+            data: ByteArray, channel: Int ->
+            /**
+             * onSent is called when a send event has completed.
+             * The data argument contains the payload that was sent.
+             */
+            setButtonStyle("SEND", R.color.send_button_default_bg, true)
+            displayToast("Message sent.")
+        }
+
+        chirp.onReceiving {
+            channel: Int ->
+            /**
+             * onReceiving is called when a receive event begins.
+             * No data has yet been received.
+             */
+            setButtonStyle("RECEIVING", R.color.send_button_gray_bg, false)
+            Log.v(TAG, "ConnectCallback: onReceiving on channel: $channel")
+        }
+
+        chirp.onReceived { data: ByteArray?, channel: Int ->
+            /**
+             * onReceived is called when a receive event has completed.
+             * If the payload was decoded successfully, it is passed in data.
+             * Otherwise, data is null.
+             */
+            setButtonStyle("SEND", R.color.send_button_default_bg, true)
+            if (data == null) {
+                displayToast("Receiving failed.")
             } else {
-                chirp.onSending {
-                    data: ByteArray, channel: Int ->
-                    /**
-                     * onSending is called when a send event begins.
-                     * The data argument contains the payload being sent.
-                     */
-                    setButtonStyle("SENDING", R.color.send_button_gray_bg, false)
-                    val message = String(data, Charsets.UTF_8)
-                    Log.v(TAG, "ConnectCallback: onSending: $message on channel: $channel")
-                }
+                displayToast("Received message.")
 
-                chirp.onSent {
-                    data: ByteArray, channel: Int ->
-                    /**
-                     * onSent is called when a send event has completed.
-                     * The data argument contains the payload that was sent.
-                     */
-                    setButtonStyle("SEND", R.color.send_button_default_bg, true)
-                    displayToast("Message sent.")
-                }
-
-                chirp.onReceiving {
-                    channel: Int ->
-                    /**
-                     * onReceiving is called when a receive event begins.
-                     * No data has yet been received.
-                     */
-                    setButtonStyle("RECEIVING", R.color.send_button_gray_bg, false)
-                    Log.v(TAG, "ConnectCallback: onReceiving on channel: $channel")
-                }
-
-                chirp.onReceived { data: ByteArray?, channel: Int ->
-                    /**
-                     * onReceived is called when a receive event has completed.
-                     * If the payload was decoded successfully, it is passed in data.
-                     * Otherwise, data is null.
-                     */
-                    setButtonStyle("SEND", R.color.send_button_default_bg, true)
-                    if (data == null) {
-                        displayToast("Receiving failed.")
-                    } else {
-                        displayToast("Received message.")
-
-                        val message = String(decryptBytes(data), Charsets.UTF_8)
-                        Log.v(TAG, "ConnectCallback: onReceived: $message on channel: $channel")
-                        updateReceivedMessage(message)
-                    }
-                }
+                val message = String(decryptBytes(data), Charsets.UTF_8)
+                Log.v(TAG, "ConnectCallback: onReceived: $message on channel: $channel")
+                updateReceivedMessage(message)
             }
-        } else {
-            Log.e("ChirpError: ", error.message)
         }
     }
 
@@ -169,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
         val bIn = ByteArrayInputStream(bytes)
         val cIn = CipherInputStream(bIn, cipher)
-        var bOut = ByteArrayOutputStream()
+        val bOut = ByteArrayOutputStream()
 
         var ch: Int = cIn.read()
         while (ch >= 0) {
@@ -188,7 +188,7 @@ class MainActivity : AppCompatActivity() {
         val cipher = Cipher.getInstance("AES/CTR/NoPadding", "BC")
 
         cipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
-        var bOut = ByteArrayOutputStream()
+        val bOut = ByteArrayOutputStream()
         val cOut = CipherOutputStream(bOut, cipher)
         cOut.write(bytes)
         cOut.close()
@@ -206,8 +206,7 @@ class MainActivity : AppCompatActivity() {
         keyBytes = keyBytes.plus(minutes.toByte())
         val digest = MessageDigest.getInstance("SHA-256")
         val hash = digest.digest(keyBytes)
-        val ivBytes: ByteArray = hash.slice(0..15).toByteArray()
-        return ivBytes
+        return hash.slice(0..15).toByteArray()
     }
 
     /**
@@ -218,10 +217,10 @@ class MainActivity : AppCompatActivity() {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            val s = encryptBytes(s.toString().toByteArray())
-            if (s.size <= maxPayloadLength) {
-                Log.d(TAG, "text size: ${s.size}")
-                messageToSendText = s.toString()
+            val encryptedBytes = encryptBytes(s.toString().toByteArray())
+            if (encryptedBytes.size <= maxPayloadLength) {
+                Log.d(TAG, "text size: ${encryptedBytes.size}")
+                messageToSendText = encryptedBytes.toString()
             } else {
                 displayToast("Message too long! Max size is $maxPayloadLength bytes.")
                 messageToSend.setText(messageToSendText)
@@ -242,7 +241,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Used to display toast popup messages
      */
-    fun Context.toast(message: CharSequence) =
+    private fun Context.toast(message: CharSequence) =
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
 
@@ -285,7 +284,8 @@ class MainActivity : AppCompatActivity() {
     private fun setButtonStyle(title: String, background: Int, isClickable: Boolean) {
         runOnUiThread{
             sendMessageBtn.text = title
-            sendMessageBtn.setBackgroundColor(resources.getColor(background))
+            val bgColor = ContextCompat.getColor(context, background)
+            sendMessageBtn.setBackgroundColor(bgColor)
             sendMessageBtn.isClickable = isClickable
         }
     }
