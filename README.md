@@ -43,3 +43,12 @@ Demonstrates how to use the Chirp Android SDK in a sample app.
 - The app will display payloads as hexadecimal strings
 
 ![DemoGIF](/Assets/ChirpDemo.gif)
+
+### Secure Messenger
+
+Chirp Secure Messenger is an extension of the Chirp Messenger app, adding in AES encryption
+to illustrate the simplicity of encrypting data using Chirp.
+
+Compatible with the iOS SecureMessenger at [chirp-ios-examples](https://github.com/chirp/chirp-ios-examples)
+
+![DemoGIF](/Assets/Messenger.gif)
