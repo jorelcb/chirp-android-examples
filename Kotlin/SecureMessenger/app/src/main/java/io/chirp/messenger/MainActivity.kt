@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager
 import io.chirp.connect.models.ChirpErrorCode
 import android.graphics.Typeface
 import android.widget.*
+import io.chirp.connect.models.ChirpConnectState
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
@@ -49,6 +50,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var chirp: ChirpConnect
 
     private val keyBytes = byteArrayOf(0x43, 0x68, 0x69, 0x72, 0x70, 0x20, 0x48, 0x61, 0x63, 0x6b, 0x61, 0x74, 0x68, 0x6f, 0x6e, 0x21)
+    private val ivBytes = generateIvBytes(keyBytes)
+    private val key = SecretKeySpec(keyBytes, "AES")
+    private val ivSpec = IvParameterSpec(ivBytes)
+    private val cipher: Cipher = Cipher.getInstance("AES/CTR/NoPadding", "BC")
 
     private lateinit var messageReceived: TextView
     private lateinit var messageToSend: EditText
@@ -59,6 +64,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Security.addProvider(BouncyCastleProvider())
 
         this.messageToSend = findViewById(R.id.messageToSend)
         this.messageReceived = findViewById(R.id.messageRreceived)
@@ -82,12 +89,6 @@ class MainActivity : AppCompatActivity() {
             Log.e("ChirpError: ", setConfigError.message)
             return
 
-        }
-
-        val startError = chirp.start()
-        if (startError.code > 0) {
-            Log.e(TAG, "ChirpError: " + startError.message)
-            return
         }
 
         maxPayloadLength = chirp.maxPayloadLength()
@@ -142,6 +143,7 @@ class MainActivity : AppCompatActivity() {
                 updateReceivedMessage(message)
             }
         }
+        startSdk()
     }
 
     /**
@@ -158,14 +160,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun encryptBytes(bytes: ByteArray) : ByteArray {
-        Security.addProvider(BouncyCastleProvider())
-        val ivBytes = generateIvBytes(keyBytes)
-
-        val key = SecretKeySpec(keyBytes, "AES")
-        val ivSpec = IvParameterSpec(ivBytes)
-        val cipher = Cipher.getInstance("AES/CTR/NoPadding", "BC")
-
-        // encryption pass
         cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
         val bIn = ByteArrayInputStream(bytes)
         val cIn = CipherInputStream(bIn, cipher)
@@ -181,12 +175,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun decryptBytes(bytes: ByteArray?) : ByteArray {
-        val ivBytes = generateIvBytes(keyBytes)
-
-        val key = SecretKeySpec(keyBytes, "AES")
-        val ivSpec = IvParameterSpec(ivBytes)
-        val cipher = Cipher.getInstance("AES/CTR/NoPadding", "BC")
-
         cipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
         val bOut = ByteArrayOutputStream()
         val cOut = CipherOutputStream(bOut, cipher)
@@ -301,18 +289,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopSdk() {
-        val error = chirp.stop()
-        if (error.code > 0) {
-            Log.e(TAG, "ConnectError: " + error.message)
-            return
+        if (chirp.getState() > ChirpConnectState.CHIRP_CONNECT_STATE_STOPPED) {
+            val error = chirp.stop()
+            if (error.code > 0) {
+                Log.e(TAG, "ConnectError: " + error.message)
+                return
+            }
         }
     }
 
     private fun startSdk() {
-        val error = chirp.start()
-        if (error.code > 0) {
-            Log.e(TAG, "ConnectError: " + error.message)
-            return
+        if (chirp.getState() < ChirpConnectState.CHIRP_CONNECT_STATE_RUNNING) {
+            val error = chirp.start()
+            if (error.code > 0) {
+                Log.e(TAG, "ConnectError: " + error.message)
+                return
+            }
         }
     }
 
