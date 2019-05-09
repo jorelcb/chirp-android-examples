@@ -50,9 +50,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var chirp: ChirpConnect
 
     private val keyBytes = byteArrayOf(0x43, 0x68, 0x69, 0x72, 0x70, 0x20, 0x48, 0x61, 0x63, 0x6b, 0x61, 0x74, 0x68, 0x6f, 0x6e, 0x21)
-    private val ivBytes = generateIvBytes(keyBytes)
     private val key = SecretKeySpec(keyBytes, "AES")
-    private val ivSpec = IvParameterSpec(ivBytes)
     private val cipher: Cipher = Cipher.getInstance("AES/CTR/NoPadding", "BC")
 
     private lateinit var messageReceived: TextView
@@ -160,6 +158,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun encryptBytes(bytes: ByteArray) : ByteArray {
+        val ivBytes = generateIvBytes(keyBytes)
+        val ivSpec = IvParameterSpec(ivBytes)
+
         cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec)
         val bIn = ByteArrayInputStream(bytes)
         val cIn = CipherInputStream(bIn, cipher)
@@ -175,6 +176,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun decryptBytes(bytes: ByteArray?) : ByteArray {
+        val ivBytes = generateIvBytes(keyBytes)
+        val ivSpec = IvParameterSpec(ivBytes)
+
         cipher.init(Cipher.DECRYPT_MODE, key, ivSpec)
         val bOut = ByteArrayOutputStream()
         val cOut = CipherOutputStream(bOut, cipher)
