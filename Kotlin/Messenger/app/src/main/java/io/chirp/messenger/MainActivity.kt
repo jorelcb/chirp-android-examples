@@ -68,7 +68,6 @@ class MainActivity : AppCompatActivity() {
         chirpConnect = ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
         Log.v(TAG, "Connect Version: " + chirpConnect.version)
 
-        chirpConnect.setListenToSelf(false)
         sendMessageBtn.setOnClickListener(sendClickListener)
         messageToSend.addTextChangedListener(textChangedListener)
 
