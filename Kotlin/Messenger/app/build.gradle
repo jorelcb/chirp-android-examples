@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    implementation 'io.chirp:chirpsdk:3.9.0'
+    implementation 'io.chirp:chirpsdk:3.9.1'
 
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
