@@ -15,15 +15,15 @@ import android.widget.TextView;
 
 import java.util.Random;
 
-import io.chirp.connect.ChirpConnect;
-import io.chirp.connect.interfaces.ConnectEventListener;
-import io.chirp.connect.models.ChirpConnectState;
-import io.chirp.connect.models.ChirpError;
+import io.chirp.chirpsdk.ChirpSDK;
+import io.chirp.chirpsdk.interfaces.ChirpEventListener;
+import io.chirp.chirpsdk.models.ChirpSDKState;
+import io.chirp.chirpsdk.models.ChirpError;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private ChirpConnect chirpConnect;
+    private ChirpSDK chirpSdk;
     private Context context;
 
     private static final int RESULT_REQUEST_RECORD_AUDIO = 1;
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     String CHIRP_APP_SECRET = "YOUR_APP_SECRET";
     String CHIRP_APP_CONFIG = "YOUR_APP_CONFIG";
 
-    String TAG = "ConnectDemoApp";
+    String TAG = "ChirpSDKDemoApp";
 
     View parentLayout;
 
@@ -74,26 +74,26 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Key and secret initialisation
          */
-        chirpConnect = new ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET);
+        chirpSdk = new ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET);
 
-        Log.v(TAG, "Connect Version: " + chirpConnect.getVersion());
-        versionView.setText(chirpConnect.getVersion());
+        Log.v(TAG, "ChirpSDK Version: " + chirpSdk.getVersion());
+        versionView.setText(chirpSdk.getVersion());
 
-        ChirpError setConfigError = chirpConnect.setConfig(CHIRP_APP_CONFIG);
+        ChirpError setConfigError = chirpSdk.setConfig(CHIRP_APP_CONFIG);
         if (setConfigError.getCode() > 0) {
             Log.e(TAG, setConfigError.getMessage());
         } else {
             startStopSdkBtn.setAlpha(1f);
             startStopSdkBtn.setClickable(true);
         }
-        String versionDisplay = chirpConnect.getVersion() + "\n" +
-                chirpConnect.getProtocolName() + " v" + chirpConnect.getProtocolVersion();
+        String versionDisplay = chirpSdk.getVersion() + "\n" +
+                chirpSdk.getProtocolName() + " v" + chirpSdk.getProtocolVersion();
         versionView.setText(versionDisplay);
-        chirpConnect.setListener(connectEventListener);
+        chirpSdk.setListener(chirpEventListener);
     }
 
 
-    ConnectEventListener connectEventListener = new ConnectEventListener() {
+    ChirpEventListener chirpEventListener = new ChirpEventListener() {
 
         @Override
         public void onSending(byte[] data, int channel) {
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 hexData = bytesToHex(data);
             }
-            Log.v(TAG, "ConnectCallback: onSending: " + hexData + " on channel: " + channel);
+            Log.v(TAG, "ChirpSDKCallback: onSending: " + hexData + " on channel: " + channel);
             updateLastPayload(hexData);
         }
 
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 hexData = bytesToHex(data);
             }
             updateLastPayload(hexData);
-            Log.v(TAG, "ConnectCallback: onSent: " + hexData + " on channel: " + channel);
+            Log.v(TAG, "ChirpSDKCallback: onSent: " + hexData + " on channel: " + channel);
         }
 
         @Override
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
              * onReceiving is called when a receive event begins.
              * No data has yet been received.
              */
-            Log.v(TAG, "ConnectCallback: onReceiving on channel: " + channel);
+            Log.v(TAG, "ChirpSDKCallback: onReceiving on channel: " + channel);
         }
 
         @Override
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             if (data != null) {
                 hexData = bytesToHex(data);
             }
-            Log.v(TAG, "ConnectCallback: onReceived: " + hexData + " on channel: " + channel);
+            Log.v(TAG, "ChirpSDKCallback: onReceived: " + hexData + " on channel: " + channel);
             updateLastPayload(hexData);
         }
 
@@ -152,18 +152,16 @@ public class MainActivity extends AppCompatActivity {
             /**
              * onStateChanged is called when the SDK changes state.
              */
-            Log.v(TAG, "ConnectCallback: onStateChanged " + oldState + " -> " + newState);
-            if (newState == ChirpConnectState.CHIRP_CONNECT_STATE_NOT_CREATED.getCode()) {
+            Log.v(TAG, "ChirpSDKCallback: onStateChanged " + oldState + " -> " + newState);
+            if (newState == ChirpSDKState.CHIRP_SDK_STATE_NOT_CREATED.getCode()) {
                 updateStatus("NotCreated");
-            } else if (newState == ChirpConnectState.CHIRP_CONNECT_STATE_STOPPED.getCode()) {
+            } else if (newState == ChirpSDKState.CHIRP_SDK_STATE_STOPPED.getCode()) {
                 updateStatus("Stopped");
-            } else if (newState == ChirpConnectState.CHIRP_CONNECT_STATE_PAUSED.getCode()) {
-                updateStatus("Paused");
-            } else if (newState == ChirpConnectState.CHIRP_CONNECT_STATE_RUNNING.getCode()) {
+            } else if (newState == ChirpSDKState.CHIRP_SDK_STATE_RUNNING.getCode()) {
                 updateStatus("Running");
-            } else if (newState == ChirpConnectState.CHIRP_CONNECT_STATE_SENDING.getCode()) {
+            } else if (newState == ChirpSDKState.CHIRP_SDK_STATE_SENDING.getCode()) {
                 updateStatus("Sending");
-            } else if (newState == ChirpConnectState.CHIRP_CONNECT_STATE_RECEIVING.getCode()) {
+            } else if (newState == ChirpSDKState.CHIRP_SDK_STATE_RECEIVING.getCode()) {
                 updateStatus("Receiving");
             } else {
                 updateStatus(newState + "");
@@ -217,14 +215,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        chirpConnect.stop();
+        chirpSdk.stop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         try {
-            chirpConnect.close();
+            chirpSdk.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -255,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void stopSdk() {
-        ChirpError error = chirpConnect.stop();
+        ChirpError error = chirpSdk.stop();
         if (error.getCode() > 0) {
             Log.e(TAG, error.getMessage());
             return;
@@ -266,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startSdk() {
-        ChirpError error = chirpConnect.start();
+        ChirpError error = chirpSdk.start();
         if (error.getCode() > 0) {
             Log.e(TAG, error.getMessage());
             return;
@@ -282,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
          * Audio is only processed when the SDK is running.
          */
         startStopSdkBtnPressed = true;
-        if (chirpConnect.getState() == ChirpConnectState.CHIRP_CONNECT_STATE_STOPPED) {
+        if (chirpSdk.getState() == ChirpSDKState.CHIRP_SDK_STATE_STOPPED) {
             startSdk();
         } else {
             stopSdk();
@@ -295,15 +293,15 @@ public class MainActivity extends AppCompatActivity {
          *
          * Generate a random payload, and send it.
          */
-    	long maxPayloadLength = chirpConnect.maxPayloadLength();
+    	long maxPayloadLength = chirpSdk.maxPayloadLength();
     	long size = (long) new Random().nextInt((int) maxPayloadLength) + 1;
-        byte[] payload = chirpConnect.randomPayload((byte) size);
-        long maxSize = chirpConnect.maxPayloadLength();
+        byte[] payload = chirpSdk.randomPayload((byte) size);
+        long maxSize = chirpSdk.maxPayloadLength();
         if (maxSize < payload.length) {
             Log.e(TAG, "Invalid Payload");
             return;
         }
-        ChirpError error = chirpConnect.send(payload);
+        ChirpError error = chirpSdk.send(payload);
         if (error.getCode() > 0) {
             Log.e(TAG, error.getMessage());
         }

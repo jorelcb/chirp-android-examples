@@ -15,9 +15,9 @@ import io.chirp.chirpsdk.ChirpSDK
 import io.chirp.chirpsdk.models.ChirpSDKState
 
 private const val REQUEST_RECORD_AUDIO = 1
-const val CHIRP_APP_KEY = ""
-const val CHIRP_APP_SECRET = ""
-const val CHIRP_APP_CONFIG = ""
+const val CHIRP_APP_KEY = "YOUR_APP_KEY"
+const val CHIRP_APP_SECRET = "YOUR_APP_SECRET"
+const val CHIRP_APP_CONFIG = "YOUR_APP_CONFIG"
 
 
 private const val TAG = "ChirpSDKDemoApp"
