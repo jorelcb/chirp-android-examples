@@ -11,20 +11,20 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import io.chirp.connect.ChirpConnect
-import io.chirp.connect.models.ChirpConnectState
+import io.chirp.chirpsdk.ChirpSDK
+import io.chirp.chirpsdk.models.ChirpSDKState
 
 private const val REQUEST_RECORD_AUDIO = 1
-internal var CHIRP_APP_KEY = ""
-internal var CHIRP_APP_SECRET = ""
-internal var CHIRP_APP_CONFIG = ""
+const val CHIRP_APP_KEY = ""
+const val CHIRP_APP_SECRET = ""
+const val CHIRP_APP_CONFIG = ""
 
 
-private const val TAG = "ConnectDemoApp"
+private const val TAG = "ChirpSDKDemoApp"
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var chirpConnect: ChirpConnect
+    private lateinit var chirpSdk: ChirpSDK
 
     private lateinit var status: TextView
     private lateinit var lastChirp: TextView
@@ -61,10 +61,10 @@ class MainActivity : AppCompatActivity() {
         /**
          * Key and secret initialisation
          */
-        this.chirpConnect = ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
-        Log.v(TAG, "Connect Version: " + chirpConnect.version)
-        versionView.text = chirpConnect.version
-        val setConfigError = chirpConnect.setConfig(CHIRP_APP_CONFIG)
+        this.chirpSdk = ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
+        Log.v(TAG, "Connect Version: " + chirpSdk.version)
+        versionView.text = chirpSdk.version
+        val setConfigError = chirpSdk.setConfig(CHIRP_APP_CONFIG)
         if (setConfigError.code > 0) {
             Log.e(TAG, setConfigError.message)
             return
@@ -73,12 +73,12 @@ class MainActivity : AppCompatActivity() {
         startStopSdkBtn.alpha = 1f
         startStopSdkBtn.isClickable = true
         startStopSdkBtn.setOnClickListener { startStopSdk() }
-        val versionText = chirpConnect.version + "\n" +
-                chirpConnect.getProtocolName() + " v" +
-                chirpConnect.getProtocolVersion()
+        val versionText = chirpSdk.version + "\n" +
+                chirpSdk.getProtocolName() + " v" +
+                chirpSdk.getProtocolVersion()
         versionView.text = versionText
 
-        chirpConnect.onSent { payload: ByteArray, channel: Int ->
+        chirpSdk.onSent { payload: ByteArray, channel: Int ->
             /**
              * onSent is called when a send event has completed.
              * The payload argument contains the payload data that was sent.
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             Log.v(TAG, "ConnectCallback: onSent: $hexData on channel: $channel")
         }
 
-        chirpConnect.onReceived { payload: ByteArray?, channel: Int ->
+        chirpSdk.onReceived { payload: ByteArray?, channel: Int ->
             /**
              * onReceived is called when a receive event has completed.
              * If the payload was decoded successfully, it is passed in payload.
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             updateLastPayload(hexData)
         }
 
-        chirpConnect.onSending { payload: ByteArray, channel: Int ->
+        chirpSdk.onSending { payload: ByteArray, channel: Int ->
             /**
              * onSending is called when a send event begins.
              * The data argument contains the payload being sent.
@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
             updateLastPayload(hexData)
         }
 
-        chirpConnect.onReceiving { channel: Int ->
+        chirpSdk.onReceiving { channel: Int ->
             /**
              * onReceiving is called when a receive event begins.
              * No data has yet been received.
@@ -120,23 +120,22 @@ class MainActivity : AppCompatActivity() {
             Log.v(TAG, "ConnectCallback: onReceiving on channel: $channel")
         }
 
-        chirpConnect.onStateChanged { oldState: ChirpConnectState, newState: ChirpConnectState ->
+        chirpSdk.onStateChanged { oldState: ChirpSDKState, newState: ChirpSDKState ->
             /**
              * onStateChanged is called when the SDK changes state.
              */
             Log.v(TAG, "ConnectCallback: onStateChanged $oldState -> $newState")
             when (newState) {
-                ChirpConnectState.CHIRP_CONNECT_STATE_NOT_CREATED -> updateStatus("NotCreated")
-                ChirpConnectState.CHIRP_CONNECT_STATE_STOPPED  -> updateStatus("Stopped")
-                ChirpConnectState.CHIRP_CONNECT_STATE_PAUSED  -> updateStatus("Paused")
-                ChirpConnectState.CHIRP_CONNECT_STATE_RUNNING  -> updateStatus("Running")
-                ChirpConnectState.CHIRP_CONNECT_STATE_SENDING  -> updateStatus("Sending")
-                ChirpConnectState.CHIRP_CONNECT_STATE_RECEIVING  -> updateStatus("Receiving")
+                ChirpSDKState.CHIRP_SDK_STATE_NOT_CREATED -> updateStatus("NotCreated")
+                ChirpSDKState.CHIRP_SDK_STATE_STOPPED  -> updateStatus("Stopped")
+                ChirpSDKState.CHIRP_SDK_STATE_RUNNING  -> updateStatus("Running")
+                ChirpSDKState.CHIRP_SDK_STATE_SENDING  -> updateStatus("Sending")
+                ChirpSDKState.CHIRP_SDK_STATE_RECEIVING  -> updateStatus("Receiving")
                 else -> updateStatus(newState.toString())
             }
         }
 
-        chirpConnect.onSystemVolumeChanged { oldVolume: Float, newVolume: Float ->
+        chirpSdk.onSystemVolumeChanged { oldVolume: Float, newVolume: Float ->
             /**
              * onSystemVolumeChanged is called when the system volume is changed.
              *
@@ -173,15 +172,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (!::chirpConnect.isInitialized) return
-        chirpConnect.stop()
+        if (!::chirpSdk.isInitialized) return
+        chirpSdk.stop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (!::chirpConnect.isInitialized) return
+        if (!::chirpSdk.isInitialized) return
         try {
-            chirpConnect.close()
+            chirpSdk.close()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -202,8 +201,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopSdk() {
-        if (!::chirpConnect.isInitialized) return
-        val error = chirpConnect.stop()
+        if (!::chirpSdk.isInitialized) return
+        val error = chirpSdk.stop()
         if (error.code > 0) {
             Log.e(TAG, "ConnectError: " + error.message)
             return
@@ -214,8 +213,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startSdk() {
-        if (!::chirpConnect.isInitialized) return
-        val error = chirpConnect.start()
+        if (!::chirpSdk.isInitialized) return
+        val error = chirpSdk.start()
         if (error.code > 0) {
             Log.e(TAG, "ConnectError: " + error.message)
             return
@@ -231,7 +230,7 @@ class MainActivity : AppCompatActivity() {
          * Audio is only processed when the SDK is running.
          */
         startStopSdkBtnPressed = true
-        if (chirpConnect.getState() === ChirpConnectState.CHIRP_CONNECT_STATE_STOPPED ) {
+        if (chirpSdk.getState() === ChirpSDKState.CHIRP_SDK_STATE_STOPPED ) {
             startSdk()
         } else {
             stopSdk()
@@ -244,8 +243,8 @@ class MainActivity : AppCompatActivity() {
          *
          * Generate a random payload, and send it.
          */
-        val payload = chirpConnect.randomPayload(0)     //size = 0 will generate a random payload size
-        val error = chirpConnect.send(payload)
+        val payload = chirpSdk.randomPayload(0)     //size = 0 will generate a random payload size
+        val error = chirpSdk.send(payload)
         if (error.code > 0) {
             Log.e("ConnectError: ", error.message)
         }
