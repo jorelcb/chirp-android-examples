@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
          * Key and secret initialisation
          */
         this.chirpSdk = ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
-        Log.v(TAG, "Connect Version: " + chirpSdk.version)
+        Log.v(TAG, "ChirpSDK Version: " + chirpSdk.version)
         versionView.text = chirpSdk.version
         val setConfigError = chirpSdk.setConfig(CHIRP_APP_CONFIG)
         if (setConfigError.code > 0) {
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
              */
             val hexData: String = payload.toHex()
             updateLastPayload(hexData)
-            Log.v(TAG, "ConnectCallback: onSent: $hexData on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onSent: $hexData on channel: $channel")
         }
 
         chirpSdk.onReceived { payload: ByteArray?, channel: Int ->
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
             if (payload != null) {
                 hexData = payload.toHex()
             }
-            Log.v(TAG, "ConnectCallback: onReceived: $hexData on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onReceived: $hexData on channel: $channel")
             updateLastPayload(hexData)
         }
 
@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
              * The data argument contains the payload being sent.
              */
             val hexData: String = payload.toHex()
-            Log.v(TAG, "ConnectCallback: onSending: $hexData on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onSending: $hexData on channel: $channel")
             updateLastPayload(hexData)
         }
 
@@ -117,14 +117,14 @@ class MainActivity : AppCompatActivity() {
              * onReceiving is called when a receive event begins.
              * No data has yet been received.
              */
-            Log.v(TAG, "ConnectCallback: onReceiving on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onReceiving on channel: $channel")
         }
 
         chirpSdk.onStateChanged { oldState: ChirpSDKState, newState: ChirpSDKState ->
             /**
              * onStateChanged is called when the SDK changes state.
              */
-            Log.v(TAG, "ConnectCallback: onStateChanged $oldState -> $newState")
+            Log.v(TAG, "ChirpSDKCallback: onStateChanged $oldState -> $newState")
             when (newState) {
                 ChirpSDKState.CHIRP_SDK_STATE_NOT_CREATED -> updateStatus("NotCreated")
                 ChirpSDKState.CHIRP_SDK_STATE_STOPPED  -> updateStatus("Stopped")
@@ -204,7 +204,7 @@ class MainActivity : AppCompatActivity() {
         if (!::chirpSdk.isInitialized) return
         val error = chirpSdk.stop()
         if (error.code > 0) {
-            Log.e(TAG, "ConnectError: " + error.message)
+            Log.e(TAG, "ChirpSDKError: " + error.message)
             return
         }
         sendPayloadBtn.alpha = .4f
@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity() {
         if (!::chirpSdk.isInitialized) return
         val error = chirpSdk.start()
         if (error.code > 0) {
-            Log.e(TAG, "ConnectError: " + error.message)
+            Log.e(TAG, "ChirpSDKError: " + error.message)
             return
         }
         sendPayloadBtn.alpha = 1f
@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity() {
         val payload = chirpSdk.randomPayload(0)     //size = 0 will generate a random payload size
         val error = chirpSdk.send(payload)
         if (error.code > 0) {
-            Log.e("ConnectError: ", error.message)
+            Log.e("ChirpSDKError: ", error.message)
         }
     }
 
