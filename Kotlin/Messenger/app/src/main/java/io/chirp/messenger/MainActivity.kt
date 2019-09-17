@@ -11,15 +11,15 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import io.chirp.connect.ChirpConnect
-import io.chirp.connect.models.ChirpConnectState
-import io.chirp.connect.models.ChirpError
+import io.chirp.chirpsdk.ChirpSDK
+import io.chirp.chirpsdk.models.ChirpSDKState
+import io.chirp.chirpsdk.models.ChirpError
+import io.chirp.chirpsdk.models.ChirpErrorCode
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
-import io.chirp.connect.models.ChirpErrorCode
 import android.graphics.Typeface
 
 
@@ -33,7 +33,7 @@ private const val TAG = "ChirpMessenger"
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var chirpConnect: ChirpConnect
+    private lateinit var chirpConnect: ChirpSDK
 
     private lateinit var messageReceived: TextView
     private lateinit var messageToSend: EditText
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         /**
          * Instantiate SDK with key secret and local config string
          */
-        chirpConnect = ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
+        chirpConnect = ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
         Log.v(TAG, "Connect Version: " + chirpConnect.version)
 
         sendMessageBtn.setOnClickListener(sendClickListener)
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                chirpConnect.onStateChanged { oldState: ChirpConnectState, newState: ChirpConnectState ->
+                chirpConnect.onStateChanged { oldState: ChirpSDKState, newState: ChirpSDKState ->
                     /**
                      * onStateChanged is called when the SDK changes state.
                      */
@@ -272,7 +272,7 @@ class MainActivity : AppCompatActivity() {
         }
         val error = chirpConnect.send(payload)
         if (error.code > 0) {
-            val volumeError = ChirpError(ChirpErrorCode.CHIRP_CONNECT_INVALID_VOLUME, "Volume too low. Please increase volume!")
+            val volumeError = ChirpError(ChirpErrorCode.CHIRP_SDK_INVALID_VOLUME, "Volume too low. Please increase volume!")
             if (error.code == volumeError.code) {
                 context.toast(volumeError.message)
             }
