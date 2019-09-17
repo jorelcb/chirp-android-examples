@@ -33,7 +33,7 @@ private const val TAG = "ChirpMessenger"
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var chirpConnect: ChirpSDK
+    private lateinit var chirpSdk: ChirpSDK
 
     private lateinit var messageReceived: TextView
     private lateinit var messageToSend: EditText
@@ -65,24 +65,24 @@ class MainActivity : AppCompatActivity() {
         /**
          * Instantiate SDK with key secret and local config string
          */
-        chirpConnect = ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
-        Log.v(TAG, "Connect Version: " + chirpConnect.version)
+        chirpSdk = ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
+        Log.v(TAG, "ChirpSDK Version: " + chirpSdk.version)
 
         sendMessageBtn.setOnClickListener(sendClickListener)
         messageToSend.addTextChangedListener(textChangedListener)
 
-        val configError = chirpConnect.setConfig(CHIRP_APP_CONFIG)
+        val configError = chirpSdk.setConfig(CHIRP_APP_CONFIG)
         if (configError.code > 0) {
             Log.e(TAG, "ChirpError" + configError.message)
         } else {
-            maxPayloadLength = chirpConnect.maxPayloadLength()
-            val startError = chirpConnect.start()
+            maxPayloadLength = chirpSdk.maxPayloadLength()
+            val startError = chirpSdk.start()
 
             if (startError.code > 0) {
                 Log.e(TAG, "ChirpError: " + startError.message)
             } else {
 
-                chirpConnect.onSent { data: ByteArray, channel: Int ->
+                chirpSdk.onSent { data: ByteArray, channel: Int ->
                     /**
                      * onSent is called when a send event has completed.
                      * The data argument contains the payload that was sent.
@@ -91,25 +91,25 @@ class MainActivity : AppCompatActivity() {
                     displayToast("Message sent.")
                 }
 
-                chirpConnect.onReceiving { channel: Int ->
+                chirpSdk.onReceiving { channel: Int ->
                     /**
                      * onReceiving is called when a receive event begins.
                      * No data has yet been received.
                      */
                     setButtonStyle("RECEIVING", R.color.send_button_gray_bg, false)
-                    Log.v(TAG, "ConnectCallback: onReceiving on channel: $channel")        }
+                    Log.v(TAG, "ChirpSDKCallback: onReceiving on channel: $channel")        }
 
-                chirpConnect.onSending { data: ByteArray, channel: Int ->
+                chirpSdk.onSending { data: ByteArray, channel: Int ->
                     /**
                      * onSending is called when a send event begins.
                      * The data argument contains the payload being sent.
                      */
                     setButtonStyle("SENDING", R.color.send_button_gray_bg, false)
                     val message = String(data, Charsets.UTF_8)
-                    Log.v(TAG, "ConnectCallback: onSending: $message on channel: $channel")
+                    Log.v(TAG, "ChirpSDKCallback: onSending: $message on channel: $channel")
                 }
 
-                chirpConnect.onReceived { data: ByteArray?, channel: Int ->
+                chirpSdk.onReceived { data: ByteArray?, channel: Int ->
                     /**
                      * onReceived is called when a receive event has completed.
                      * If the payload was decoded successfully, it is passed in data.
@@ -121,16 +121,16 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         displayToast("Received message.")
                         val message = String(data, Charsets.UTF_8)
-                        Log.v(TAG, "ConnectCallback: onReceived: $message on channel: $channel")
+                        Log.v(TAG, "ChirpSDKCallback: onReceived: $message on channel: $channel")
                         updateReceivedMessage(message)
                     }
                 }
 
-                chirpConnect.onStateChanged { oldState: ChirpSDKState, newState: ChirpSDKState ->
+                chirpSdk.onStateChanged { oldState: ChirpSDKState, newState: ChirpSDKState ->
                     /**
                      * onStateChanged is called when the SDK changes state.
                      */
-                    Log.v(TAG, "ConnectCallback: onStateChanged $oldState -> $newState")
+                    Log.v(TAG, "ChirpSDKCallback: onStateChanged $oldState -> $newState")
                 }
             }
         }
@@ -207,13 +207,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        chirpConnect.stop()
+        chirpSdk.stop()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         try {
-            chirpConnect.close()
+            chirpSdk.close()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -243,17 +243,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopSdk() {
-        val error = chirpConnect.stop()
+        val error = chirpSdk.stop()
         if (error.code > 0) {
-            Log.e(TAG, "ConnectError: " + error.message)
+            Log.e(TAG, "ChirpSDKError: " + error.message)
             return
         }
     }
 
     private fun startSdk() {
-        val error = chirpConnect.start()
+        val error = chirpSdk.start()
         if (error.code > 0) {
-            Log.e(TAG, "ConnectError: " + error.message)
+            Log.e(TAG, "ChirpSDKError: " + error.message)
             return
         }
     }
@@ -265,18 +265,18 @@ class MainActivity : AppCompatActivity() {
          * Convert String payload to  a byte array, and send it.
          */
         val payload = payload.toByteArray(Charsets.UTF_8)
-        val maxPayloadLength = chirpConnect.maxPayloadLength()
+        val maxPayloadLength = chirpSdk.maxPayloadLength()
         if (payload.size > maxPayloadLength) {
-            Log.e("ConnectError: ", "Payload too long")
+            Log.e("ChirpSDKError: ", "Payload too long")
             return;
         }
-        val error = chirpConnect.send(payload)
+        val error = chirpSdk.send(payload)
         if (error.code > 0) {
             val volumeError = ChirpError(ChirpErrorCode.CHIRP_SDK_INVALID_VOLUME, "Volume too low. Please increase volume!")
             if (error.code == volumeError.code) {
                 context.toast(volumeError.message)
             }
-            Log.e("ConnectError: ", error.message)
+            Log.e("ChirpSDKError: ", error.message)
         }
     }
 }
