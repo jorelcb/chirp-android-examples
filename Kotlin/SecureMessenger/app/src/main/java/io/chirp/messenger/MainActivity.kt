@@ -8,20 +8,20 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
-import io.chirp.connect.ChirpConnect
-import io.chirp.connect.models.ChirpError
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import io.chirp.connect.models.ChirpErrorCode
 import android.graphics.Typeface
 import android.widget.*
-import io.chirp.connect.models.ChirpConnectState
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import io.chirp.chirpsdk.ChirpSDK
+import io.chirp.chirpsdk.models.ChirpErrorCode
+import io.chirp.chirpsdk.models.ChirpError
+import io.chirp.chirpsdk.models.ChirpSDKState
 
 import java.security.Security
 import java.util.*
@@ -47,7 +47,7 @@ private const val TAG = "ChirpSecureMessenger"
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var chirp: ChirpConnect
+    private lateinit var chirp: ChirpSDK
 
     private val keyBytes = byteArrayOf(0x43, 0x68, 0x69, 0x72, 0x70, 0x20, 0x48, 0x61, 0x63, 0x6b, 0x61, 0x74, 0x68, 0x6f, 0x6e, 0x21)
     private val key = SecretKeySpec(keyBytes, "AES")
@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         /**
          * Instantiate SDK with key secret and local config string
          */
-        chirp = ChirpConnect(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
+        chirp = ChirpSDK(this, CHIRP_APP_KEY, CHIRP_APP_SECRET)
         Log.v(TAG, "ChirpSDK Version: " + chirp.version)
 
         val setConfigError = chirp.setConfig(CHIRP_APP_CONFIG)
@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
              */
             setButtonStyle("SENDING", R.color.send_button_gray_bg, false)
             val message = String(data, Charsets.UTF_8)
-            Log.v(TAG, "ConnectCallback: onSending: $message on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onSending: $message on channel: $channel")
         }
 
         chirp.onSent {
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
              * No data has yet been received.
              */
             setButtonStyle("RECEIVING", R.color.send_button_gray_bg, false)
-            Log.v(TAG, "ConnectCallback: onReceiving on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onReceiving on channel: $channel")
         }
 
         chirp.onReceived { data: ByteArray?, channel: Int ->
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                 displayToast("Received message.")
 
                 val message = String(decryptBytes(data), Charsets.UTF_8)
-                Log.v(TAG, "ConnectCallback: onReceived: $message on channel: $channel")
+                Log.v(TAG, "ChirpSDKCallback: onReceived: $message on channel: $channel")
                 updateReceivedMessage(message)
             }
         }
@@ -293,20 +293,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun stopSdk() {
-        if (chirp.getState() > ChirpConnectState.CHIRP_CONNECT_STATE_STOPPED) {
+        if (chirp.getState() > ChirpSDKState.CHIRP_SDK_STATE_STOPPED) {
             val error = chirp.stop()
             if (error.code > 0) {
-                Log.e(TAG, "ConnectError: " + error.message)
+                Log.e(TAG, "ChirpSDKError: " + error.message)
                 return
             }
         }
     }
 
     private fun startSdk() {
-        if (chirp.getState() < ChirpConnectState.CHIRP_CONNECT_STATE_RUNNING) {
+        if (chirp.getState() < ChirpSDKState.CHIRP_SDK_STATE_RUNNING) {
             val error = chirp.start()
             if (error.code > 0) {
-                Log.e(TAG, "ConnectError: " + error.message)
+                Log.e(TAG, "ChirpSDKError: " + error.message)
                 return
             }
         }
@@ -321,16 +321,16 @@ class MainActivity : AppCompatActivity() {
         val encryptedPayload = encryptBytes(payload.toByteArray(Charsets.UTF_8))
         val maxPayloadLength = chirp.maxPayloadLength()
         if (encryptedPayload.size > maxPayloadLength) {
-            Log.e("ConnectError: ", "Payload too long")
+            Log.e("ChirpSDKError: ", "Payload too long")
             return
         }
         val error = chirp.send(encryptedPayload)
         if (error.code > 0) {
-            val volumeError = ChirpError(ChirpErrorCode.CHIRP_CONNECT_INVALID_VOLUME, "Volume too low. Please increase volume!")
+            val volumeError = ChirpError(ChirpErrorCode.CHIRP_SDK_INVALID_VOLUME, "Volume too low. Please increase volume!")
             if (error.code == volumeError.code) {
                 context.toast(volumeError.message)
             }
-            Log.e("ConnectError: ", error.message)
+            Log.e("ChirpSDKError: ", error.message)
         }
     }
 }
