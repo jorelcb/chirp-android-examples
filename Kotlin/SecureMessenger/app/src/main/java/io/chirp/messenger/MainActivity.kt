@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
              */
             setButtonStyle("SENDING", R.color.send_button_gray_bg, false)
             val message = String(data, Charsets.UTF_8)
-            Log.v(TAG, "ConnectCallback: onSending: $message on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onSending: $message on channel: $channel")
         }
 
         chirp.onSent {
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
              * No data has yet been received.
              */
             setButtonStyle("RECEIVING", R.color.send_button_gray_bg, false)
-            Log.v(TAG, "ConnectCallback: onReceiving on channel: $channel")
+            Log.v(TAG, "ChirpSDKCallback: onReceiving on channel: $channel")
         }
 
         chirp.onReceived { data: ByteArray?, channel: Int ->
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity() {
                 displayToast("Received message.")
 
                 val message = String(decryptBytes(data), Charsets.UTF_8)
-                Log.v(TAG, "ConnectCallback: onReceived: $message on channel: $channel")
+                Log.v(TAG, "ChirpSDKCallback: onReceived: $message on channel: $channel")
                 updateReceivedMessage(message)
             }
         }
@@ -296,7 +296,7 @@ class MainActivity : AppCompatActivity() {
         if (chirp.getState() > ChirpSDKState.CHIRP_SDK_STATE_STOPPED) {
             val error = chirp.stop()
             if (error.code > 0) {
-                Log.e(TAG, "ConnectError: " + error.message)
+                Log.e(TAG, "ChirpSDKError: " + error.message)
                 return
             }
         }
@@ -306,7 +306,7 @@ class MainActivity : AppCompatActivity() {
         if (chirp.getState() < ChirpSDKState.CHIRP_SDK_STATE_RUNNING) {
             val error = chirp.start()
             if (error.code > 0) {
-                Log.e(TAG, "ConnectError: " + error.message)
+                Log.e(TAG, "ChirpSDKError: " + error.message)
                 return
             }
         }
@@ -321,7 +321,7 @@ class MainActivity : AppCompatActivity() {
         val encryptedPayload = encryptBytes(payload.toByteArray(Charsets.UTF_8))
         val maxPayloadLength = chirp.maxPayloadLength()
         if (encryptedPayload.size > maxPayloadLength) {
-            Log.e("ConnectError: ", "Payload too long")
+            Log.e("ChirpSDKError: ", "Payload too long")
             return
         }
         val error = chirp.send(encryptedPayload)
@@ -330,7 +330,7 @@ class MainActivity : AppCompatActivity() {
             if (error.code == volumeError.code) {
                 context.toast(volumeError.message)
             }
-            Log.e("ConnectError: ", error.message)
+            Log.e("ChirpSDKError: ", error.message)
         }
     }
 }
