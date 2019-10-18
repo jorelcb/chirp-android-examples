@@ -1,12 +1,12 @@
 package io.chirp.messenger
 
 enum class ItemMessages {
-    ITEM1 {
+    VIPTICKET {
         override fun message(): String {
             return "1111111110000012990003509455555"
         }
     },
-    ITEM2 {
+    REGULARTICKET {
         override fun message(): String {
             return "111111111000008990003509355555"
         }

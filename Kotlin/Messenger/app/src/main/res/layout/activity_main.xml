@@ -89,8 +89,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:checked="false"
-                    android:text="Item 1"
                     android:contentDescription="1234123412341234"
+                    android:text="Regular Ticket"
                     android:textColor="#ff8800"
                     android:textSize="18sp" />
 
@@ -99,8 +99,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Item 2"
                     android:contentDescription="34563456345634563456"
+                    android:text="VIP Ticket"
                     android:textColor="#ff8800"
                     android:textSize="18sp" />
 
@@ -114,7 +114,7 @@
                 android:layout_marginBottom="16dp"
                 android:background="@color/send_button_default_bg"
                 android:gravity="center"
-                android:text="PAGAR"
+                android:text="PAY"
                 android:textSize="24sp" />
 
             <TextView
@@ -124,7 +124,7 @@
                 android:layout_weight="10"
                 android:background="@color/received_background"
                 android:gravity="top"
-                android:hint="Received message"
+                android:hint="Message received"
                 android:padding="10dp"
                 android:textColor="#000000"
                 android:textSize="24sp" />
