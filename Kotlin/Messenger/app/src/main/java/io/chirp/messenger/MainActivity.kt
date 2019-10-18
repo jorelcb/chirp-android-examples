@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
                         displayToast("Received message.")
                         val message = String(data, Charsets.UTF_8)
                         Log.v(TAG, "ChirpSDKCallback: onReceived: $message on channel: $channel")
-                        updateReceivedMessage(message, this)
+                        updateReceivedMessage(message)//, this)
                     }
                 }
 
@@ -292,17 +292,17 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
         }
     }
 
-    private fun updateReceivedMessage(newPayload: String, context: Context) {
+    private fun updateReceivedMessage(newPayload: String) {//, context: Context) {
         runOnUiThread {
             if(newPayload.contains("rechazado")){
                 messageReceived.text = newPayload
-                messageReceived.setBackGroundColor(0xFF000000) // NEGRO
+                messageReceived.setBackGroundColor(0xFF0000) // NEGRO
                 messageReceived.setTextColor(Color.parseColor("#F25A5A")) // ROJO
                 ///val intent = Intent(context, MainActivity::class.java)
                 ///context.startActivity(intent)
             } else {
                 messageReceived.text = newPayload
-                messageReceived.setBackGroundColor(0xFF000000) // NEGRO
+                messageReceived.setBackGroundColor(0xFF0000) // NEGRO
                 messageReceived.setTextColor(Color.parseColor("#01BC14")) // VERDE
             }
 
