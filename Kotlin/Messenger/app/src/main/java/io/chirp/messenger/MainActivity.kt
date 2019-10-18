@@ -38,58 +38,28 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
 
     private lateinit var chirpSdk: ChirpSDK
 
-    ///
-    val buttonTexts = arrayListOf("Buttons", "Text", "Both")
-    val ID = 101
-    ///
-
     private lateinit var messageReceived: TextView
-    private lateinit var messageToSend: String
+    private lateinit var messageToSend: RadioButton
+    private lateinit var radioGroup: RadioGroup
     private lateinit var sendMessageBtn: Button
     private lateinit var context: Context
     private var maxPayloadLength = 0
+    private lateinit var checkedRadioButton: RadioButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ///
-
-        val secondRg = RadioGroup(this)
-        secondRg.orientation = RadioGroup.HORIZONTAL
-        secondRg.weightSum = 3f
-        secondRg.id = ID
-        secondRg.contentDescription = "Widgets"
-        secondRg.setOnCheckedChangeListener(this)
-        linearLayout.firstRg.setOnCheckedChangeListener(this)
-
-
-        val p = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        p.weight = 0.5f
-
-        for (i in 0 until buttonTexts.size) {
-            val radioButton = RadioButton(this)
-            radioButton.apply {
-                text = buttonTexts[i]
-                id = i
-                layoutParams = p
-            }
-            secondRg.addView(radioButton)
-        }
-
-
-        ///
-
-        // HARDCORE
-
-        this.messageToSend = "000123451234Pago exitoso"///findViewById(R.id.messageToSend)
+        this.messageToSend = findViewById(R.id.radioButton1)
+        this.radioGroup = findViewById(R.id.firstRg)
         this.messageReceived = findViewById(R.id.messageReceived)
         this.sendMessageBtn = findViewById(R.id.sendMessage)
         this.context = this
+        this.checkedRadioButton = radioGroup?.findViewById(radioGroup.checkedRadioButtonId) as RadioButton
 
         val calibreLight = Typeface.createFromAsset(assets, "fonts/calibre_light.ttf")
         val calibreMedium = Typeface.createFromAsset(assets, "fonts/calibre_medium.ttf")
-        //messageToSend.typeface = calibreLight
+        messageToSend.typeface = calibreLight
         messageReceived.typeface = calibreLight
         sendMessageBtn.typeface = calibreMedium
 
@@ -106,7 +76,7 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
         Log.v(TAG, "ChirpSDK Version: " + chirpSdk.version)
 
         sendMessageBtn.setOnClickListener(sendClickListener)
-        //messageToSend.addTextChangedListener(textChangedListener)
+        messageToSend.addTextChangedListener(textChangedListener)
 
         val configError = chirpSdk.setConfig(CHIRP_APP_CONFIG)
         if (configError.code > 0) {
@@ -134,7 +104,8 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
                      * No data has yet been received.
                      */
                     setButtonStyle("RECEIVING", R.color.send_button_gray_bg, false)
-                    Log.v(TAG, "ChirpSDKCallback: onReceiving on channel: $channel")        }
+                    Log.v(TAG, "ChirpSDKCallback: onReceiving on channel: $channel")
+                }
 
                 chirpSdk.onSending { data: ByteArray, channel: Int ->
                     /**
@@ -176,13 +147,13 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     }
 
     override fun onCheckedChanged(group: RadioGroup?, checkId: Int) {
-        val checkedRadioButton = group?.findViewById(group.checkedRadioButtonId) as? RadioButton
+        checkedRadioButton = (group?.findViewById(group.checkedRadioButtonId) as? RadioButton)!!
         checkedRadioButton?.let {
 
             if (checkedRadioButton.isChecked)
-                Toast.makeText(applicationContext, "RadioGroup: ${group?.contentDescription} RadioButton: ${checkedRadioButton?.text}", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, "RadioGroup: ${group?.contentDescription} RadioButton: ${checkedRadioButton?.contentDescription}", Toast.LENGTH_LONG).show()
         }
-
+        println(checkedRadioButton.toString())
     }
 
     fun androidlyRadioButton(view: View) {
@@ -197,11 +168,18 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
      */
     private val sendClickListener = fun(view: View) {
         view.hideKeyboard()
-        val message = messageToSend //messageToSend.text.toString()
+
+//        var message = onCheckedChanged(radioGroup, 0).toString()
+
+        var message = messageToSend.text.toString()
+
         if (message.isEmpty()) {
-            displayToast("Please enter a message first.")
+            displayToast("Please select item first.")
         } else {
-            sendPayload(messageToSend)//messageToSend.text.toString())
+            var checkedTemp = checkedRadioButton.text.toString().replace("\\s".toRegex(), "").toUpperCase()
+            var payloadMessage = ItemMessages.valueOf(checkedTemp).message()
+            sendPayload(payloadMessage)
+//            sendPayload(messageToSend.text.toString())
         }
     }
 
@@ -281,7 +259,7 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     }
 
     private fun setButtonStyle(title: String, background: Int, isClickable: Boolean) {
-        runOnUiThread{
+        runOnUiThread {
             sendMessageBtn.text = title
             sendMessageBtn.setBackgroundColor(resources.getColor(background))
             sendMessageBtn.isClickable = isClickable
@@ -289,14 +267,14 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     }
 
     private fun displayToast(message: String) {
-        runOnUiThread{
+        runOnUiThread {
             context.toast(message)
         }
     }
 
     private fun updateReceivedMessage(newPayload: String, context: Context) {
         runOnUiThread {
-            if(newPayload.contains("rechazado")){
+            if (newPayload.contains("rechazado")) {
                 messageReceived.text = newPayload
                 messageReceived.setBackGroundColor(0xFF000000) // NEGRO
                 messageReceived.setTextColor(Color.parseColor("#F25A5A")) // ROJO

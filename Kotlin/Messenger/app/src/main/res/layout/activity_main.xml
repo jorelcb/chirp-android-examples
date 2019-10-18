@@ -75,11 +75,22 @@
                 android:contentDescription="Layouts"
                 android:orientation="vertical">
 
+<!--                <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="120dp"-->
+<!--                    android:background="000000"-->
+<!--                    android:drawableLeft="@drawable/ticket_120x120"-->
+<!--                    android:text="Item 1"-->
+<!--                    android:textColor="#ff8800"-->
+<!--                    android:textSize="18sp" />-->
+
                 <RadioButton
                     android:id="@+id/radioButton1"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:checked="false"
                     android:text="Item 1"
+                    android:contentDescription="1234123412341234"
                     android:textColor="#ff8800"
                     android:textSize="18sp" />
 
@@ -87,9 +98,10 @@
                     android:id="@+id/radioButton2"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:checked="true"
                     android:text="Item 2"
+                    android:contentDescription="34563456345634563456"
                     android:textColor="#ff8800"
-                    android:layout_marginBottom="16dp"
                     android:textSize="18sp" />
 
             </RadioGroup>
