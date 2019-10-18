@@ -75,33 +75,26 @@
                 android:contentDescription="Layouts"
                 android:orientation="vertical">
 
-<!--                <RadioButton-->
-<!--                    android:layout_width="fill_parent"-->
-<!--                    android:layout_height="120dp"-->
-<!--                    android:background="000000"-->
-<!--                    android:drawableLeft="@drawable/ticket_120x120"-->
-<!--                    android:text="Item 1"-->
-<!--                    android:textColor="#ff8800"-->
-<!--                    android:textSize="18sp" />-->
-
                 <RadioButton
                     android:id="@+id/radioButton1"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="140dp"
                     android:checked="false"
                     android:contentDescription="1234123412341234"
-                    android:text="Regular Ticket"
-                    android:textColor="#ff8800"
+                    android:text="      Regular Ticket"
+                    android:textColor="#03A9F4"
+                    android:drawableLeft="@drawable/ticket_120x120"
                     android:textSize="18sp" />
 
                 <RadioButton
                     android:id="@+id/radioButton2"
                     android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="140dp"
                     android:checked="true"
                     android:contentDescription="34563456345634563456"
-                    android:text="VIP Ticket"
-                    android:textColor="#ff8800"
+                    android:text="      VIP Ticket"
+                    android:textColor="#03A9F4"
+                    android:drawableLeft="@drawable/ticket_120x120"
                     android:textSize="18sp" />
 
             </RadioGroup>
