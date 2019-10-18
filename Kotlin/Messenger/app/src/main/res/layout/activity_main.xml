@@ -27,6 +27,7 @@
         tools:layout_constraintTop_creator="1">
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -46,24 +47,52 @@
                     android:layout_gravity="top|left"
                     app:srcCompat="@drawable/mercadopago_logo" />
 
+                <ImageView
+                    android:id="@+id/uls"
+                    android:layout_width="wrap_content"
+                    android:layout_height="63dp"
+                    android:layout_gravity="top|right"
+                    app:srcCompat="@drawable/uls" />
+
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/messageToSend"
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select item to buy"
+                android:textAllCaps="true"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#234568"
+                android:textColorHint="@color/received_hint"
+                android:textStyle="bold|italic" />
+
+            <RadioGroup
+                android:id="@+id/firstRg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_weight="10"
-                android:background="@color/send_background"
-                android:ems="10"
-                android:gravity="top"
-                android:hint="Enter message..."
-                android:inputType="textPersonName"
-                android:padding="10dp"
-                android:text=""
-                android:textColor="@color/send_text"
-                android:textColorHint="@color/send_hint"
-                android:textSize="24sp" />
+                android:contentDescription="Layouts"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/radioButton1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Item 1"
+                    android:textColor="#ff8800"
+                    android:textSize="18sp" />
+
+                <RadioButton
+                    android:id="@+id/radioButton2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Item 2"
+                    android:textColor="#ff8800"
+                    android:layout_marginBottom="16dp"
+                    android:textSize="18sp" />
+
+            </RadioGroup>
 
             <Button
                 android:id="@+id/sendMessage"
@@ -77,16 +106,15 @@
                 android:textSize="24sp" />
 
             <TextView
-                android:id="@+id/messageRreceived"
+                android:id="@+id/messageReceived"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:layout_weight="10"
                 android:background="@color/received_background"
                 android:gravity="top"
                 android:hint="Received message"
                 android:padding="10dp"
-                android:textColor="@color/received_text"
-                android:textColorHint="@color/received_hint"
+                android:textColor="#000000"
                 android:textSize="24sp" />
         </LinearLayout>
 
