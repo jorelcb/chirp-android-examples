@@ -94,7 +94,7 @@
                     android:contentDescription="34563456345634563456"
                     android:text="      VIP Ticket"
                     android:textColor="#03A9F4"
-                    android:drawableLeft="@drawable/ticket_120x120"
+                    android:drawableLeft="@drawable/ticketvip_120x120"
                     android:textSize="18sp" />
 
             </RadioGroup>

@@ -151,9 +151,10 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
         checkedRadioButton?.let {
 
             if (checkedRadioButton.isChecked)
-                Toast.makeText(applicationContext, "RadioGroup: ${group?.contentDescription} RadioButton: ${checkedRadioButton?.contentDescription}", Toast.LENGTH_LONG).show()
+                println(checkedRadioButton.toString())
+//                Toast.makeText(applicationContext, "RadioGroup: ${group?.contentDescription} RadioButton: ${checkedRadioButton?.text}", Toast.LENGTH_LONG).show()
         }
-        println(checkedRadioButton.toString())
+//        println(checkedRadioButton.toString())
     }
 
     fun androidlyRadioButton(view: View) {
@@ -169,9 +170,9 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
     private val sendClickListener = fun(view: View) {
         view.hideKeyboard()
 
-//        var message = onCheckedChanged(radioGroup, 0).toString()
+        var message = onCheckedChanged(radioGroup, 0).toString()
 
-        var message = messageToSend.text.toString()
+        message = messageToSend.text.toString()
 
         if (message.isEmpty()) {
             displayToast("Please select item first.")
