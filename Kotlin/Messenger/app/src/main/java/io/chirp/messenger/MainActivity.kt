@@ -274,18 +274,14 @@ class MainActivity : AppCompatActivity(), RadioGroup.OnCheckedChangeListener {
 
     private fun updateReceivedMessage(newPayload: String) {//, context: Context) {
         runOnUiThread {
-            if (newPayload.contains("rechazado")) {
-                messageReceived.text = newPayload
-                messageReceived.setBackGroundColor(0xFF0000) // NEGRO
-                messageReceived.setTextColor(Color.parseColor("#F25A5A")) // ROJO
-                ///val intent = Intent(context, MainActivity::class.java)
-                ///context.startActivity(intent)
-            } else {
-                messageReceived.text = newPayload
+            messageReceived.text = newPayload
+            if (newPayload.contains("successful")) {
                 messageReceived.setBackGroundColor(0xFF0000) // NEGRO
                 messageReceived.setTextColor(Color.parseColor("#01BC14")) // VERDE
+            } else {
+                messageReceived.setBackGroundColor(0xFF0000) // NEGRO
+                messageReceived.setTextColor(Color.parseColor("#F25A5A")) // ROJO
             }
-
         }
     }
 
